@@ -6,6 +6,7 @@ from tornado.httpserver import HTTPServer
 from tornado.web import Application
 from tornado.ioloop import IOLoop
 from routers  import rules
+from middleware import  middlewares
 
 define(name="addr", default="127.0.0.1", metavar="http listen address")
 define(name="port", default=8080, metavar="http listen port(8080)")
@@ -16,6 +17,7 @@ class TornadoApplication(Application):
         Application.__init__(self, rules) 
 
 def httpserver():
+    mids= middlewares
     server = HTTPServer(TornadoApplication(),xheaders=True)
     server.listen(options.port)
     IOLoop.current().start()
