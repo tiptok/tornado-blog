@@ -7,7 +7,8 @@ from middleware import middlewares
 class PostHandler(BaseHandler):
     async def get(self,id=None):
         if id=='':
-            p = Post.select().limit(10) #.limit(1)
+            lt = int(self.get_argument("limit"))
+            p = Post.select().limit(lt)
             posts = []
             for post in p:
                 posts.append({'title':post.title,'content':post.content})
@@ -24,15 +25,16 @@ class PostHandler(BaseHandler):
     def delete(self,id):
         self.write("blog delete " + id)
     def put(self,id):
-        self.write("blog put " + id)  
-    def post(self):
-        p = Post.select().limit(10) #.limit(1)
-        posts = []
-        for post in p:
-            posts.append({'title':post.title,'content':post.content})
-        self.write(json.dumps(posts))
-
+        data = json.loads(self.request.body)
+        self.write("blog put %s  %s" % (id,data["id"]))  
+    def post(self,id=None):
+       data = json.loads(self.request.body)
+       self.write("blog post %s" % json.dumps(data))
 routers = [
+    ## post
     (r'/blog/([^/]*)',PostHandler,dict(middleware=middlewares())),
-    (r'/blog/(\d+)',PostHandler,dict(middleware=middlewares()))
+    ## delete get put
+    (r'/blog/(.*)(\d+)',PostHandler,dict(middleware=middlewares())),
+    ## list
+    (r'/blog?(.*)',PostHandler,dict(middleware=middlewares()))    
 ]        

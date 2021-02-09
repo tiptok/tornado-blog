@@ -15,7 +15,7 @@ class LogIntercept(MiddleWare):
 
 class ResponseIntercept(MiddleWare):
     def log(self, handler):
-        print("log before:",handler)
+        print("log after:",handler)
 
     def process_request(self, handler):
         self.log(handler)
