@@ -8,17 +8,16 @@ class MiddleWare(object):
 
 class LogIntercept(MiddleWare):
     def log(self, handler):
-        print("log before:",handler)
+        print("log before recv:",handler.request.uri)
 
     def process_request(self, handler):
         self.log(handler)
-
 class ResponseIntercept(MiddleWare):
     def log(self, handler):
-        print("log after:",handler)
+        print("log after",handler)
 
     def process_request(self, handler):
-        self.log(handler)
-
+        # self.log(handler)
+        pass
 def middlewares():
     return (LogIntercept(),ResponseIntercept() )

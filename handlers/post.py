@@ -7,11 +7,11 @@ from middleware import middlewares
 class PostHandler(BaseHandler):
     async def get(self,id=None):
         if id=='':
-            lt = int(self.get_argument("limit"))
+            lt = int(self.get_argument("limit",default=0))
             p = Post.select().limit(lt)
             posts = []
             for post in p:
-                posts.append({'title':post.title,'content':post.content})
+                posts.append({'title':post.title,'content':post.content,"category_name":post.category.name})
             self.write(json.dumps(posts))
             return
         try:
