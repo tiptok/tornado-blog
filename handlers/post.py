@@ -30,6 +30,7 @@ class PostHandler(BaseHandler):
     def post(self,id=None):
        data = json.loads(self.request.body)
        self.write("blog post %s" % json.dumps(data))
+
 routers = [
     ## post
     (r'/blog/([^/]*)',PostHandler,dict(middleware=middlewares())),

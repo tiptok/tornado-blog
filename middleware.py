@@ -1,3 +1,5 @@
+from loguru import logger
+
 class MiddleWare(object):
     def process_request(self, handler):
         pass
@@ -8,13 +10,13 @@ class MiddleWare(object):
 
 class LogIntercept(MiddleWare):
     def log(self, handler):
-        print("log before recv:",handler.request.uri)
+        logger.debug("log before recv:" + handler.request.uri)
 
     def process_request(self, handler):
         self.log(handler)
 class ResponseIntercept(MiddleWare):
     def log(self, handler):
-        print("log after",handler)
+        logger.debug("log after",handler)
 
     def process_request(self, handler):
         # self.log(handler)

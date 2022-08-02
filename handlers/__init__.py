@@ -9,8 +9,9 @@ class BaseHandler(RequestHandler):
     def prepare(self):
         for middleware in self.middleware:
             middleware.process_request(self)
-        if self.request.headers['Content-Type'] == 'application/json':
-            self.args = json.loads(self.request.body)
+        if 'Content-Type' in self.request.headers:
+            if self.request.headers['Content-Type'] == 'application/json':
+                self.args = json.loads(self.request.body)
     def set_default_headers(self):
         self.set_header('Access-Control-Allow-Origin', '*')
         self.set_header('Access-Control-Allow-Headers', '*')
