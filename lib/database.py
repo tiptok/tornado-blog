@@ -34,3 +34,4 @@ class Database(object):
         except:
             pass
 
+db = Database({'db':"MYSQL"})

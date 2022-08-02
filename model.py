@@ -1,6 +1,8 @@
-import peewee
 import datetime
-from core import db
+
+import peewee
+from lib.database import db
+
 
 class Category(db.Model):
     name = peewee.CharField()
@@ -17,18 +19,6 @@ class Post(db.Model):
     tags = peewee.CharField(null=True)
     slug = peewee.CharField(null=True)
     created = peewee.DateTimeField(default=datetime.datetime.now)
-
-    # @cached_property
-    # def prev(self):
-    #     posts = Post.select().where(Post.created < self.created)\
-    #         .order_by(Post.created)
-    #     return posts.get() if posts.exists() else None
-
-    # @cached_property
-    # def next(self):
-    #     posts = Post.select().where(Post.created > self.created)\
-    #         .order_by(Post.created)
-    #     return posts.get() if posts.exists() else None
 
     class Meta:
         table_name = "posts"

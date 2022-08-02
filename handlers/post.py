@@ -1,41 +1,55 @@
-from handlers import BaseHandler
-from model import Post
+from model import Post,Category
 import json
-from playhouse.shortcuts import model_to_dict,dict_to_model
-from middleware import middlewares
+from playhouse.shortcuts import model_to_dict
+from flask import Blueprint,request
+from lib.log import logger
+from lib.common import Response,ResponseList
 
-class PostHandler(BaseHandler):
-    async def get(self,id=None):
-        if id=='':
-            lt = int(self.get_argument("limit",default=0))
-            p = Post.select().limit(lt)
-            posts = []
-            for post in p:
-                posts.append({'title':post.title,'content':post.content,"category_name":post.category.name})
-            self.write(json.dumps(posts))
-            return
-        try:
-            p = Post.get(id=id)
-            dictPost = model_to_dict(p)
-            dictPost.pop('created')
-            # print(model_to_dict(p,exclude= ['created']))
-            self.write(json.dumps(dictPost))
-        except Exception as e:
-             print(e)
-    def delete(self,id):
-        self.write("blog delete " + id)
-    def put(self,id):
-        data = json.loads(self.request.body)
-        self.write("blog put %s  %s" % (id,data["id"]))  
-    def post(self,id=None):
-       data = json.loads(self.request.body)
-       self.write("blog post %s" % json.dumps(data))
+app = Blueprint('post',__name__)
 
-routers = [
-    ## post
-    (r'/blog/([^/]*)',PostHandler,dict(middleware=middlewares())),
-    ## delete get put
-    (r'/blog/(.*)(\d+)',PostHandler,dict(middleware=middlewares())),
-    ## list
-    (r'/blog?(.*)',PostHandler,dict(middleware=middlewares()))    
-]        
+@app.route('/blog/<int:id>',methods=['GET'])
+def blog_get(id=None):
+    if id=='':
+        return
+    try:
+        p = Post.get(id=id)
+        dictPost = model_to_dict(p)
+        dictPost.pop('created')
+        # print(model_to_dict(p,exclude= ['created']))
+        return json.dumps(dictPost)
+    except Exception as e:
+         print(e)
+
+@app.route('/blog/<int:id>',methods=['DELETE'])
+def blog_delete(id):
+    Post.delete_by_id(id)
+    return Response("blog delete %d" % id)
+
+@app.route('/blog',methods=['POST'])
+def blog_post(id=None):
+   data = json.loads(request.data)
+   post = Post(
+       title = data['title'],
+       content = data['content'],
+       tags = data['tags'],
+       category = data['categoryId'],
+       channel=data['channel'],
+   )
+   post.save()
+   return Response('save success %d' % post.id,model_to_dict(post))
+
+@app.route('/blog/<int:id>',methods=['PUT'])
+def blog_put(id):
+    data = json.loads(request.data)
+    try:
+        post = Post.get(id=id)
+        post.title = data['title']
+        post.content = data['content']
+        post.tags = data['tags']
+        post.category = data['categoryId']
+        post.channel = data['channel']
+        post.save()
+    except Exception as e:
+       logger.error(e)
+    # data = json.loads(request.data)
+    return Response("blog put %s  %s" % (id,data['title']))

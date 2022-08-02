@@ -1,6 +1,6 @@
 import logging
-from loguru import logger
 
+from loguru import logger
 
 logger = logger
 
